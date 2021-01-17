@@ -78,6 +78,7 @@ class Post(models.Model):
         str_return = str(self.text)[:15]
         return str_return
 
+
 class Comment(models.Model):
 
     post = models.ForeignKey(

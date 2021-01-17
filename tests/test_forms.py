@@ -8,7 +8,7 @@ from django.test import Client, TestCase
 from django.urls import reverse
 
 from posts.forms import PostForm
-from posts.models import Group, Post, User, Follow
+from posts.models import Follow, Group, Post, User
 
 
 class CheckPostForm(TestCase):

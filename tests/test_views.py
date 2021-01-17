@@ -1,14 +1,14 @@
 import shutil
 import tempfile
 
-from django.conf import settings
 from django import forms
+from django.conf import settings
 from django.contrib.auth import get_user_model
 from django.core.files.uploadedfile import SimpleUploadedFile
 from django.test import Client, TestCase
 from django.urls import reverse
 
-from posts.models import Group, Post, User, Follow
+from posts.models import Follow, Group, Post, User
 
 
 class PostViewTest(TestCase):

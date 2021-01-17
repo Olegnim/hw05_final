@@ -3,7 +3,7 @@ from django.core.paginator import Paginator
 from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import CommentForm, PostForm
-from .models import Comment, Group, Post, User, Follow
+from .models import Comment, Follow, Group, Post, User
 
 
 def index(request):
@@ -123,6 +123,7 @@ def post_view(request, username, post_id):
     }
     return render(request, 'post.html', context)
 
+
 @login_required
 def add_comment(request, username, post_id):
     username = get_object_or_404(User, username=username)
@@ -183,7 +184,9 @@ def post_edit(request, username, post_id):
                           'post': post,
                       }
                       )
-    form = PostForm(request.POST or None, files=request.FILES or None, instance=post)
+    form = PostForm(request.POST or None, 
+                    files=request.FILES or None, 
+                    instance=post)
     if form.is_valid():
         post = form.save(commit=False)
         form.save()
@@ -222,7 +225,6 @@ def profile_follow(request, username):
     return profile(request, username)
     
 
-
 @login_required
 def profile_unfollow(request, username):
     author = get_object_or_404(User, username=username)
@@ -242,4 +244,4 @@ def page_not_found(request, exception):
 
 
 def server_error(request):
-    return render(request, "misc/500.html", status=500) 
+    return render(request, "misc/500.html", status=500)
