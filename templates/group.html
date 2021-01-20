@@ -1,18 +1,20 @@
 {% extends "base.html" %} 
 {% block title %}Записи сообщества {{ group }}{% endblock %} 
 {% block content %}
-<div class="container">
-  <h1>{{ group.title }}</h1>
-  <p>{{ group.description }}</p>
-  {% for post in posts %}
-  <h3 class="h3">
-    Автор: {{ post.author.get_full_name }}, 
-    Дата публикации: {{ post.pub_date|date:"d M Y" }}
-  </h3>
-  {% include "post_item.html" with post=post %} {% endfor %}
-  <hr />
-</div>
-{% if page.has_other_pages %} 
-{% include "paginator.html" with items=page paginator=paginator%}
-{% endif %} 
+  <div class="container">
+    <h1>{{ group.title }}</h1>
+    <p>{{ group.description|linebreaksbr }}</p>
+    {% for post in posts %}
+      <h3 class="h3">
+        Автор: <a class="p-2 text-dark" href="{% url 'profile' post.author.username %}">{{ post.author.get_full_name }}</a>, 
+        группа: <a class="card-link muted" href="{% url 'group' post.group.slug %}">#{{ post.group.title }}</a>        
+        Дата публикации: {{ post.pub_date|date:"d M Y" }}
+      </h3>
+      {% include "post_item.html" with post=post %} 
+    {% endfor %}
+    <hr />
+    </div>
+    {% if page.has_other_pages %} 
+      {% include "paginator.html" with items=page paginator=paginator%}
+    {% endif %} 
 {% endblock %}

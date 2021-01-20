@@ -133,8 +133,8 @@ class CheckPostForm(TestCase):
         self.assertEqual(response.status_code, 200)
 
     def test_cache_index_page(self):
-        """ Проеврка кэширования главной страницы """
-        html_index_0 = self.guest_client.get('/')
+        """ Проверка кэширования главной страницы """
+        self.html_index_0 = self.guest_client.get('/')
 
         form_data = {
             'text': 'Кролики - это не только ценный мех 2',
@@ -146,10 +146,10 @@ class CheckPostForm(TestCase):
             follow=True
         )
 
-        html_index_1 = self.guest_client.get('/')
+        self.html_index_1 = self.guest_client.get('/')
         self.assertHTMLEqual(
-            str(html_index_0.content), 
-            str(html_index_1.content),
+            str(self.html_index_0.content),
+            str(self.html_index_1.content),
             'Что-то пошло не так'
             )
 
@@ -168,7 +168,6 @@ class CheckPostForm(TestCase):
         )
         follow_list = Follow.objects.filter(user=self.user)
         follow_list_count = Follow.objects.filter(user=self.user).count()
-        print(str(follow_list_count))
         self.assertEqual(follow_list_count, 1)
         self.assertEqual(str(follow_list[0].author), 'Inga')
         self.assertEqual(response.status_code, 200)        
