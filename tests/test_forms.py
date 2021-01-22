@@ -11,6 +11,26 @@ from posts.forms import PostForm
 from posts.models import Follow, Group, Post, User
 
 
+INDEX_URL = '/'
+NEW_POST_URL = '/new'
+POST_URL = '/Inga/1/'
+GROUP_TITLE = 'Кролики'
+GROUP_DESCRIPTION = 'Про кроликов'
+GROUP_SLUG = 'rabbits'
+USERNAME = 'Inga'
+USERNAME2 = 'Vasya'
+SMALL_GIF = (
+    b'\x47\x49\x46\x38\x39\x61\x01\x00'
+    b'\x01\x00\x00\x00\x00\x21\xf9\x04'
+    b'\x01\x0a\x00\x01\x00\x2c\x00\x00'
+    b'\x00\x00\x01\x00\x01\x00\x00\x02'
+    b'\x02\x4c\x01\x00\x3b'
+    )
+POST_TEXT = 'Кролики - это не только ценный мех'
+POST_TEXT_2 = 'Кролики - это не только ценный мех 2'
+POST_EDIT_TEXT = 'Кролики - это мясо'
+ERROR_CACHE = 'Что-то пошло не так'
+
 class CheckPostForm(TestCase):
     @classmethod
     def setUpClass(cls):
@@ -22,12 +42,14 @@ class CheckPostForm(TestCase):
 
         Post.objects.create(
             id=1,
-            text='Кролики - это не только ценный мех',
-            author=User.objects.create_user(username='Inga', id=1),
+            text=POST_TEXT,
+            # если убрать id тесты падают 
+            # django.db.utils.IntegrityError: UNIQUE constraint failed: auth_user.username
+            author=User.objects.create_user(username=USERNAME, id=1), 
             group=Group.objects.create(
-                title='Кролики',
-                description='Про кроликов',
-                slug='rabbits'
+                title=GROUP_TITLE,
+                description=GROUP_DESCRIPTION,
+                slug=GROUP_SLUG
             )
         )
 
@@ -41,7 +63,7 @@ class CheckPostForm(TestCase):
 
     def setUp(self):       
         self.guest_client = Client()
-        self.user = get_user_model().objects.create_user(username='Inga', id=1)
+        self.user = get_user_model().objects.create_user(username=USERNAME, id=1)
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
 
@@ -50,20 +72,14 @@ class CheckPostForm(TestCase):
         """Валидная форма создает запись Post с картинкой."""
 
         posts_count = Post.objects.count()
-        small_gif = (
-            b'\x47\x49\x46\x38\x39\x61\x01\x00'
-            b'\x01\x00\x00\x00\x00\x21\xf9\x04'
-            b'\x01\x0a\x00\x01\x00\x2c\x00\x00'
-            b'\x00\x00\x01\x00\x01\x00\x00\x02'
-            b'\x02\x4c\x01\x00\x3b'
-        )
+
         uploaded = SimpleUploadedFile(
             name='small.gif',
-            content=small_gif,
+            content=SMALL_GIF,
             content_type='image/gif'
         )
         form_data = {
-            'text': 'Кролики - это не только ценный мех 2',
+            'text': POST_TEXT_2,
             'image': uploaded,
         }
         response = self.authorized_client.post(
@@ -72,7 +88,7 @@ class CheckPostForm(TestCase):
             follow=True
         )
 
-        self.assertRedirects(response, '/')
+        self.assertRedirects(response, INDEX_URL)
         self.assertEqual(Post.objects.count(), posts_count+1)
         self.assertTrue(Post.objects.filter(
             text='Кролики - это не только ценный мех 2'
@@ -93,7 +109,7 @@ class CheckPostForm(TestCase):
         post_count = Post.objects.count()
 
         form_data = {
-            'text': 'Кролики - это не только ценный мех 2',
+            'text': POST_TEXT_2,
         }
 
         response = self.authorized_client.post(
@@ -102,10 +118,10 @@ class CheckPostForm(TestCase):
             follow=True
         )
 
-        self.assertRedirects(response, '/')
+        self.assertRedirects(response, INDEX_URL)
         self.assertEqual(Post.objects.count(), post_count+1)
         self.assertTrue(Post.objects.filter(
-            text='Кролики - это не только ценный мех 2'
+            text=POST_TEXT_2
         ).exists())
         self.assertEqual(response.status_code, 200)
 
@@ -113,13 +129,13 @@ class CheckPostForm(TestCase):
         post_count = Post.objects.count()
 
         form_data = {
-            'text': 'Кролики - это мясо',
+            'text': POST_EDIT_TEXT,
         }
 
         response = self.authorized_client.post(
             reverse('post_edit',
                 kwargs={
-                    'username': 'Inga',
+                    'username': USERNAME,
                     'post_id': 1,
                     }
             ),
@@ -127,17 +143,17 @@ class CheckPostForm(TestCase):
             follow=True
         )
         post_text = response.context.get('post').text
-        self.assertRedirects(response, '/Inga/1/')        
+        self.assertRedirects(response, POST_URL)        
         self.assertEqual(Post.objects.count(), post_count)
-        self.assertEqual(post_text, 'Кролики - это мясо')
+        self.assertEqual(post_text, POST_EDIT_TEXT)
         self.assertEqual(response.status_code, 200)
 
     def test_cache_index_page(self):
         """ Проверка кэширования главной страницы """
-        self.html_index_0 = self.guest_client.get('/')
+        self.html_index_0 = self.guest_client.get(INDEX_URL)
 
         form_data = {
-            'text': 'Кролики - это не только ценный мех 2',
+            'text': POST_TEXT_2,
         }
 
         response = self.authorized_client.post(
@@ -146,35 +162,35 @@ class CheckPostForm(TestCase):
             follow=True
         )
 
-        self.html_index_1 = self.guest_client.get('/')
+        self.html_index_1 = self.guest_client.get(INDEX_URL)
         self.assertHTMLEqual(
             str(self.html_index_0.content),
             str(self.html_index_1.content),
-            'Что-то пошло не так'
+            ERROR_CACHE
             )
 
 
     def test_unfollowing(self):
         """ Авторизованный пользователь может подписаться и отписаться на автора """
-        self.user = get_user_model().objects.create_user(username='Vasya', id=2)
+        self.user = get_user_model().objects.create_user(username=USERNAME2, id=2)
         self.authorized_client = Client()
         self.authorized_client.force_login(self.user)
         response = self.authorized_client.post(
             reverse('profile_follow',
                 kwargs={
-                    'username': 'Inga',
+                    'username': USERNAME,
                     }
             )     
         )
         follow_list = Follow.objects.filter(user=self.user)
         follow_list_count = Follow.objects.filter(user=self.user).count()
         self.assertEqual(follow_list_count, 1)
-        self.assertEqual(str(follow_list[0].author), 'Inga')
+        self.assertEqual(str(follow_list[0].author), USERNAME)
         self.assertEqual(response.status_code, 200)        
         response = self.authorized_client.post(
             reverse('profile_unfollow',
                 kwargs={
-                    'username': 'Inga',
+                    'username': USERNAME,
                     }
             )     
         )
