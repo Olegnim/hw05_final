@@ -8,11 +8,3 @@ class SignUp(CreateView):
     form_class = CreationForm
     success_url = reverse_lazy("signup")
     template_name = "signup.html"
-
-
-def user_contact(request):
-    form = ContactForm()
-
-    contact = Contact.objects.get(pk=3)
-    form = ContactForm(instance=contact)
-    return render(request, 'contact.html', {'form': form})
