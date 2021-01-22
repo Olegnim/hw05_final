@@ -11,7 +11,6 @@ class SignUp(CreateView):
 
 
 def user_contact(request):
-
     form = ContactForm()
 
     contact = Contact.objects.get(pk=3)

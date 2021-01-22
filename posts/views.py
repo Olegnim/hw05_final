@@ -57,11 +57,11 @@ def profile(request, username):
     countfollowing = Follow.objects.filter(
         user=user_id).count()
     countfollower = Follow.objects.filter(
-            author=user_id).count()
+        author=user_id).count()
     if request.user.is_authenticated:
         following = False
         if Follow.objects.filter(author=user_id, user=request.user).exists():
-            following = True     
+            following = True
     else:
         following = False
     paginator = Paginator(post_list, 10)
@@ -86,7 +86,7 @@ def post_view(request, username, post_id):
     countfollowing = Follow.objects.filter(
         user=username).count()
     countfollower = Follow.objects.filter(
-        author=username).count()    
+        author=username).count()
     count = Post.objects.select_related(
         'author').filter(author=username).count()
     all_comments = Comment.objects.filter(post_id=post_id)
@@ -101,7 +101,7 @@ def post_view(request, username, post_id):
             'comments': all_comments,
             'form': form,
             'countfollower': countfollower,
-            'countfollowing': countfollowing,            
+            'countfollowing': countfollowing,
         }
         return render(request, 'post.html', context)
     form = CommentForm(request.POST)
@@ -111,7 +111,7 @@ def post_view(request, username, post_id):
         comments.post_id = post_id
         form.save()
         return redirect('post', username=username, post_id=post_id)
-    form = CommentForm()         
+    form = CommentForm()
     context = {
         'post': post,
         'author': username,
@@ -131,7 +131,7 @@ def add_comment(request, username, post_id):
     countfollowing = Follow.objects.filter(
         user=username).count()
     countfollower = Follow.objects.filter(
-        author=username).count()    
+        author=username).count()
     count = Post.objects.select_related(
         'author').filter(author=username).count()
     all_comments = Comment.objects.filter(post_id=post_id)
@@ -146,7 +146,7 @@ def add_comment(request, username, post_id):
             'comments': all_comments,
             'form': form,
             'countfollower': countfollower,
-            'countfollowing': countfollowing,            
+            'countfollowing': countfollowing,
         }
         return render(request, 'post.html', context)
     form = CommentForm(request.POST)
@@ -156,7 +156,7 @@ def add_comment(request, username, post_id):
         comments.post_id = post_id
         form.save()
         return redirect('post', username=username, post_id=post_id)
-    form = CommentForm()         
+    form = CommentForm()
     context = {
         'post': post,
         'author': username,
@@ -184,8 +184,8 @@ def post_edit(request, username, post_id):
                           'post': post,
                       }
                       )
-    form = PostForm(request.POST or None, 
-                    files=request.FILES or None, 
+    form = PostForm(request.POST or None,
+                    files=request.FILES or None,
                     instance=post)
     if form.is_valid():
         post = form.save(commit=False)
@@ -223,7 +223,7 @@ def profile_follow(request, username):
         return follow_index(request)
     Follow.objects.get_or_create(user=request.user, author=author)
     return profile(request, username)
-    
+
 
 @login_required
 def profile_unfollow(request, username):
@@ -236,9 +236,9 @@ def profile_unfollow(request, username):
 
 def page_not_found(request, exception):
     return render(
-        request, 
-        "misc/404.html", 
-        {"path": request.path}, 
+        request,
+        "misc/404.html",
+        {"path": request.path},
         status=404
     )
 

@@ -4,15 +4,14 @@ from .models import Comment, Post
 
 
 class PostForm(forms.ModelForm):
-
     text = forms.CharField(
         label='Текст',
         widget=forms.Textarea(attrs={'class': 'form-control'}),
         required=True,
         help_text='Введите текст вашего поста'
     )
-    class Meta:
 
+    class Meta:
         model = Post
         fields = [
             'group',
@@ -28,15 +27,14 @@ class PostForm(forms.ModelForm):
 
 
 class CommentForm(forms.ModelForm):
-
     text = forms.CharField(
         label='Комментарий',
         widget=forms.Textarea(attrs={'class': 'form-control'}),
         required=True,
-        help_text='Введите вашего комментария'        
+        help_text='Введите вашего комментария'
     )
-    class Meta:
 
+    class Meta:
         model = Comment
         fields = [
             'text',

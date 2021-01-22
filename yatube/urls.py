@@ -10,7 +10,7 @@ handler500 = "posts.views.server_error"  # noqa
 urlpatterns = [
     path('about/', include('about.urls', namespace='about')),
     path('auth/', include('users.urls')),
-    path('auth/', include('django.contrib.auth.urls')),       
+    path('auth/', include('django.contrib.auth.urls')),
     path('admin/', admin.site.urls),
     path('', include('posts.urls')),
 ]

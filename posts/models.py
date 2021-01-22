@@ -5,7 +5,6 @@ User = get_user_model()
 
 
 class Group(models.Model):
-
     title = models.CharField(
         max_length=200,
         verbose_name='Заголовок',
@@ -28,7 +27,6 @@ class Group(models.Model):
 
 
 class Post(models.Model):
-
     text = models.TextField(
         blank=True,
         null=True,
@@ -68,24 +66,23 @@ class Post(models.Model):
         ordering = ('-pub_date',)
 
     def __str__(self):
-        #str_return = (
+        # str_return = (
         #    str(self.author) + ' / ' +
         #    str(self.pub_date.strftime('%d.%m.%Y')) + ' / ' +
         #    str(self.group) + ' / ' +
         #    str(self.text)[0:50] + '...'
-        #)
+        # )
         # Для тестов возврат 15ти символов текста
         str_return = str(self.text)[:15]
         return str_return
 
 
 class Comment(models.Model):
-
     post = models.ForeignKey(
         Post,
         on_delete=models.CASCADE,
         blank=True,
-        null=True,            
+        null=True,
         related_name='comments',
         verbose_name='Запись',
         help_text='Запись'
@@ -119,7 +116,6 @@ class Comment(models.Model):
 
 
 class Follow(models.Model):
-
     user = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
